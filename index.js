@@ -5,7 +5,7 @@ var MuxDemux = require('mux-demux');
 var websocket = require('websocket-stream');
 
 var httpServer = http.createServer();
-httpServer.listen(5000, function() {
+httpServer.listen(process.env.PORT || 4000, function() {
   console.log('http server is live');
 });
 
