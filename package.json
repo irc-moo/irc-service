@@ -1,0 +1,22 @@
+{
+  "name": "irc-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irc-moo/irc-service.git"
+  },
+  "author": "irc-moo",
+  "bugs": {
+    "url": "https://github.com/irc-moo/irc-service/issues"
+  },
+  "homepage": "https://github.com/irc-moo/irc-service#readme",
+  "dependencies": {
+    "mux-demux": "^3.7.9",
+    "websocket-stream": "^2.1.0"
+  }
+}
