@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/irc-moo/irc-service#readme",
   "dependencies": {
-    "mux-demux": "^3.7.9",
+    "multiplex": "^6.6.1",
+    "rpc-stream": "^2.1.2",
     "websocket-stream": "^2.1.0"
   }
 }

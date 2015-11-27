@@ -1,38 +1,50 @@
-var net = require('net');
-var http = require('http');
-var fs = require('fs');
-var MuxDemux = require('mux-demux');
-var websocket = require('websocket-stream');
+const net = require('net');
+const http = require('http');
+const fs = require('fs');
+const Multiplex = require('multiplex');
+const websocket = require('websocket-stream');
+const rpc = require('rpc-stream');
 
-var httpServer = http.createServer();
-httpServer.listen(process.env.PORT || 4000, function() {
+const httpServer = http.createServer();
+const wss = websocket.createServer({server: httpServer}, handleWsClient);
+
+httpServer.listen(process.env.PORT || 4005, function() {
   console.log('http server is live');
 });
 
-var websocketClients = {};
+function handleWsClient(websocketStream) {
+  const servers = {};
+  const multiplexer = Multiplex();
+  const streamMoo = multiplexer.createSharedStream('irc-moo');
 
-var wss = websocket.createServer({server: httpServer}, handleWsClient);
+  const rpcServer = rpc({
+    connect(serverAddress, done) {
+      if(servers[serverAddress]) {
+        done({message: `Already connected to sever ${serverAddress}`});
+        return;
+      }
+      const ircServerStream = net.connect({
+        host: serverAddress,
+        port: 6667
+      });
+      const s = multiplexer.createSharedStream(serverAddress);
+      ircServerStream.pipe(s).pipe(ircServerStream);
 
-function handleWsClient(clientStream) {
-  console.log('websocket client connected');
+      servers[serverAddress] = ircServerStream;
+      done(null);
+    },
+    disconnect(serverAddress, done) {
+      if(!servers[serverAddress]) {
+        done({message: `Never connected to server ${serverAddress}`});
+        return;
+      }
+      servers[serverAddress].end();
+      delete servers[serverAddress];
+      done(null);
+    }
+  });
 
-  var meta = 'main';
-  var a = MuxDemux();
-  a.createWriteStream(meta);
-  a.createStream(meta);
-
-  clientStream.pipe(a);
-  b.pipe();
-  // var ircStream = net.connect({
-  //   port: 6667,
-  //   host: 'irc.freenode.org'
-  // });
-  // ircStream.pipe(clientStream).pipe(ircStream);
-  var needle = 'foobar';
-
-  var demuxStream = clientStream
-    .pipe(demuxClientStream);
-
-  demuxClientStream.createWriteStream
-  //.pipe(StreamSearch(new StreamSearch(needle)));
+  websocketStream.pipe(multiplexer).pipe(websocketStream);
+  streamMoo.pipe(rpcServer).pipe(streamMoo);
+  streamMoo.pipe(process.stdout);
 }
